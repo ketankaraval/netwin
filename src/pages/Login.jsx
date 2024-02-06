@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+
 import {
   TextField,
   IconButton,
@@ -13,8 +16,11 @@ import {
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import FlexBox from '../components/FlexBox';
+import { login, loginSuccess , loginFailed} from '../Slice/authSlice'
 
 const Login = () => {
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
   const [values, setValues] = useState({
     username: '',
     password: '',
@@ -33,8 +39,30 @@ const Login = () => {
     event.preventDefault();
   };
 
-  const handleSubmit = async event => {
+  const handleSubmit = (event) => {
     event.preventDefault();
+    // setLoading(true);
+
+    dispatch(login(values))
+      .unwrap()
+      .then((res) => {
+
+        if (res.message === 'Invalid credentials') {
+          console.log(res.message);
+          dispatch(loginFailed(res))
+        } else {
+          console.log('You are successfully logged in');
+          dispatch(loginSuccess(res));
+
+          navigate('/Product');
+
+        }
+
+
+      })
+      .catch(() => {
+        // setLoading(false);
+      });
     // Call your API here
   };
 
